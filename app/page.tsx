@@ -2,6 +2,8 @@
 
 import React from 'react';
 import styled from 'styled-components';
+import {AiOutlineCheckCircle} from 'react-icons/ai';
+import { create } from 'zustand';
 
 const Content = styled.div`
   margin: 40px;
@@ -103,12 +105,7 @@ export default function Home() {
         </div>
         <div>
         <Task>
-          <TaskDesc>Sample task</TaskDesc>
-          <TaskEdit>Edit</TaskEdit>
-          <TaskDel>Delete</TaskDel>
-        </Task>
-        <Task>
-          <TaskDesc>Sample task</TaskDesc>
+          <TaskDesc><AiOutlineCheckCircle size={18}/>&nbsp;Sample task</TaskDesc>
           <TaskEdit>Edit</TaskEdit>
           <TaskDel>Delete</TaskDel>
         </Task>
