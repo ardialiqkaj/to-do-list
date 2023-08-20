@@ -1,6 +1,13 @@
 import * as React from "react";
 import styled from 'styled-components';
-import { useState } from 'react';
+import useStore, { Item } from '../store'; // Update the import path to your actual Store location
+import { useState } from "react";
+
+interface UpdateModalProps {
+  itemId: number;
+  onClose: () => void;
+}
+
 
 const Modal = styled.div`
   position: fixed;
@@ -74,7 +81,7 @@ const CheckForm = styled.form`
 `;
 
 const UpdateModal = () => {
-    
+
     return (
         <Modal>
             <ModalContainer>
@@ -87,14 +94,17 @@ const UpdateModal = () => {
                     <ModalRowDiv>
                         <Paragraph>Completed?</Paragraph>
                         <CheckForm>
-                            <input type="checkbox" id="Yes" name="Yes" value="Yes"></input>
-                            <label>Yes</label>
+                          <input type="checkbox">
+                          </input>
+                          <label>Yes</label>
                         </CheckForm>
                     </ModalRowDiv>
                 </FirstModalRow>
                 <ModalRow>
                     <Paragraph>Text:</Paragraph>
-                    <TextInput type="text" placeholder="Type new text here..."></TextInput>
+                    <TextInput 
+                      type="text">
+                    </TextInput>
                 </ModalRow>
                 <ModalRow>
                     <ButtonCancel>Cancel</ButtonCancel>

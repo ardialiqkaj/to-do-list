@@ -60,8 +60,9 @@ const TaskDel = styled.button`
 function ItemAdd() {
   const store = useStore((state) => state);
 
-  const { items, removeItem } = useStore();
+  const { items, removeItem, updateItem } = useStore();
   const [selectedItemId, setSelectedItemId] = React.useState(null);
+  const [selectedItemForEdit, setSelectedItemForEdit] = React.useState(null);
 
   const openDeleteModal = (itemId) => {
     setSelectedItemId(itemId);
@@ -69,6 +70,14 @@ function ItemAdd() {
 
   const closeDeleteModal = () => {
     setSelectedItemId(null);
+  };
+
+  const openUpdateModal = (item) => {
+    setSelectedItemForEdit(item);
+  };
+
+  const closeUpdateModal = () => {
+    setSelectedItemForEdit(null);
   };
 
 
@@ -85,7 +94,7 @@ function ItemAdd() {
           <TaskDesc><AiOutlineCheckCircle size={18}/>
             &nbsp;{item.text}
           </TaskDesc>
-          <TaskEdit>Edit</TaskEdit>
+          <TaskEdit onClick={() => openUpdateModal(item)}>Edit</TaskEdit>
           <TaskDel onClick={() => openDeleteModal(item.id)}><RiDeleteBinLine size={18}/></TaskDel>
           {selectedItemId !== null && (
           <DeleteModal
@@ -96,6 +105,16 @@ function ItemAdd() {
             }}
           />
           )}
+          {selectedItemForEdit !== null && (
+            <UpdateModal
+              item={selectedItemForEdit}
+              onClose={closeUpdateModal}
+              onUpdate={(updatedText) => {
+                updateItem(selectedItemForEdit.id, updatedText);
+                closeUpdateModal();
+              }}
+              />
+            )}
         </Task>
         ))}
         </div>
