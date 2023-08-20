@@ -1,5 +1,6 @@
 import * as React from "react";
 import styled from 'styled-components';
+import useStore from "../store";
 
 const FirstColumn = styled.div`
   display: flex;
@@ -29,10 +30,21 @@ const Input = styled.input`
 `;
 
 function TodoAdd() {
+  const store = useStore((state) => state);
+
   return (
     <FirstColumn>
-    <Input type="text"></Input>
-    <CreateButton>Create</CreateButton>
+    <Input
+        type="text"
+        value={store.newItem}
+        onChange={(evt) => store.setNewItem(evt.target.value)}
+        placeholder="New item"></Input>
+    <CreateButton
+      onClick={() => {
+      store.addItem();
+    }}>
+      Create
+    </CreateButton>
   </FirstColumn>
   );
 }

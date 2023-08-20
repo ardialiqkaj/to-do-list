@@ -2,6 +2,10 @@ import * as React from "react";
 import styled from 'styled-components';
 import {AiOutlineCheckCircle} from 'react-icons/ai';
 import {RiDeleteBinLine} from 'react-icons/ri';
+import useStore from "../store";
+import DeleteModal from './DeleteModal';
+import UpdateModal from './UpdateModal';
+
 
 const ListButton = styled.button`
   color: #424242;
@@ -53,7 +57,21 @@ const TaskDel = styled.button`
   color: white;
 `;
 
-function TodoAdd() {
+function ItemAdd() {
+  const store = useStore((state) => state);
+
+  const { items, removeItem } = useStore();
+  const [selectedItemId, setSelectedItemId] = React.useState(null);
+
+  const openDeleteModal = (itemId) => {
+    setSelectedItemId(itemId);
+  };
+
+  const closeDeleteModal = () => {
+    setSelectedItemId(null);
+  };
+
+
   return (
     <div>
         <div>
@@ -62,14 +80,27 @@ function TodoAdd() {
             <ListButton>Incompleted</ListButton>
         </div>
         <div>
-            <Task>
-                <TaskDesc><AiOutlineCheckCircle size={18}/>&nbsp;Sample task</TaskDesc>
-                <TaskEdit>Edit</TaskEdit>
-                <TaskDel><RiDeleteBinLine size={22}/></TaskDel>
-            </Task>
+        {store.items.map((item) => (
+        <Task key={item.id}>
+          <TaskDesc><AiOutlineCheckCircle size={18}/>
+            &nbsp;{item.text}
+          </TaskDesc>
+          <TaskEdit>Edit</TaskEdit>
+          <TaskDel onClick={() => openDeleteModal(item.id)}><RiDeleteBinLine size={18}/></TaskDel>
+          {selectedItemId !== null && (
+          <DeleteModal
+            onClose={closeDeleteModal}
+            onDelete={() => {
+              removeItem(selectedItemId);
+              closeDeleteModal();
+            }}
+          />
+          )}
+        </Task>
+        ))}
         </div>
     </div>
   );
 }
 
-export default TodoAdd;
+export default ItemAdd;
