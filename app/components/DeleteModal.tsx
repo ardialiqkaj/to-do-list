@@ -1,13 +1,6 @@
-import * as React from "react";
-import styled from 'styled-components';
-import {RiDeleteBinLine} from 'react-icons/ri';
-
-interface DeleteModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onDelete: () => void;
-    itemName: string;
-  }
+import React from "react";
+import styled from "styled-components";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const Modal = styled.div`
   position: fixed;
@@ -78,33 +71,41 @@ const ButtonDel = styled.button`
   color: white;
 `;
 
-const DeleteModal = ({ onClose, onDelete }) => {
-
-    const handleDelete = () => {
-        // Perform the actual delete logic here
-        // ...
-        // Close the modal after delete
-        onClose();
-      };
-    
-      const handleCancel = () => {
-        // Close the modal without deleting
-        onClose();
-      };
-
-    return (
-        <Modal>
-            <ModalContainer>
-                <DeleteBg><DeleteIcon><RiDeleteBinLine size={18}/></DeleteIcon></DeleteBg>
-                <h3>Delete Task</h3>
-                <Paragraph>Are you sure you want to delete this task? This action can't be undone!</Paragraph>
-                <Buttons>
-                    <ButtonCancel onClick={onClose}>Cancel</ButtonCancel>
-                    <ButtonDel onClick={onDelete}>Delete</ButtonDel>
-                </Buttons>
-            </ModalContainer>
-        </Modal>
-    );
+interface DeleteModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onDelete: () => void;
 }
+
+const DeleteModal: React.FC<DeleteModalProps> = ({
+  isOpen,
+  onClose,
+  onDelete,
+}) => {
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <Modal>
+      <ModalContainer>
+        <DeleteBg>
+          <DeleteIcon>
+            <RiDeleteBinLine size={18} />
+          </DeleteIcon>
+        </DeleteBg>
+        <h3>Delete Task</h3>
+        <Paragraph>
+          Are you sure you want to delete this task? This action can't be
+          undone!
+        </Paragraph>
+        <Buttons>
+          <ButtonCancel onClick={onClose}>Cancel</ButtonCancel>
+          <ButtonDel onClick={onDelete}>Delete</ButtonDel>
+        </Buttons>
+      </ModalContainer>
+    </Modal>
+  );
+};
 
 export default DeleteModal;

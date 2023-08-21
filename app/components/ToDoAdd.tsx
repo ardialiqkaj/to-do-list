@@ -27,6 +27,8 @@ const Input = styled.input`
   flex: 5;
   border-radius: 5px;
   margin: 8px;
+  padding-left: 5px;
+  font-size: 16px;
 `;
 
 function TodoAdd() {

@@ -1,11 +1,10 @@
 import * as React from "react";
-import styled from 'styled-components';
-import {AiOutlineCheckCircle} from 'react-icons/ai';
-import {RiDeleteBinLine} from 'react-icons/ri';
+import styled from "styled-components";
+import { AiOutlineCheckCircle } from "react-icons/ai";
+import { RiDeleteBinLine } from "react-icons/ri";
 import useStore from "../store";
-import DeleteModal from './DeleteModal';
-import UpdateModal from './UpdateModal';
-
+import DeleteModal from "./DeleteModal";
+import { useState } from "react";
 
 const ListButton = styled.button`
   color: #424242;
@@ -57,67 +56,127 @@ const TaskDel = styled.button`
   color: white;
 `;
 
+const DoneInputBox = styled.div`
+  display: flex;
+  border: 2px solid #b4b4b4;
+  border-radius: 5px;
+  height: 50px;
+  margin: 8px;
+  padding-left: 2px;
+  padding-right: 2px;
+`;
+
+const EditingInput = styled.input`
+  border: 2px solid #b4b4b4;
+  height: 50%;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  margin-left: 3px;
+`;
+
 function ItemAdd() {
-  const store = useStore((state) => state);
+  const items = useStore((state) => state.items);
+  const toggleItem = useStore((state) => state.toggleItem);
+  const updateItem = useStore((state) => state.updateItem);
+  const removeItem = useStore((state) => state.removeItem);
 
-  const { items, removeItem, updateItem } = useStore();
-  const [selectedItemId, setSelectedItemId] = React.useState(null);
-  const [selectedItemForEdit, setSelectedItemForEdit] = React.useState(null);
+  const [editingItemId, setEditingItemId] = useState<number | null>(null);
+  const [editedText, setEditedText] = useState<string>("");
 
-  const openDeleteModal = (itemId) => {
-    setSelectedItemId(itemId);
+  const startEditing = (id: number, text: string) => {
+    setEditingItemId(id);
+    setEditedText(text);
+  };
+
+  const cancelEditing = () => {
+    setEditingItemId(null);
+    setEditedText("");
+  };
+
+  const saveEditedItem = (id: number) => {
+    if (editedText.trim() !== "") {
+      updateItem(id, editedText);
+    }
+    setEditingItemId(null);
+    setEditedText("");
+  };
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
+
+  const openDeleteModal = (id: number) => {
+    setDeletingItemId(id);
+    setIsDeleteModalOpen(true);
   };
 
   const closeDeleteModal = () => {
-    setSelectedItemId(null);
+    setDeletingItemId(null);
+    setIsDeleteModalOpen(false);
   };
 
-  const openUpdateModal = (item) => {
-    setSelectedItemForEdit(item);
+  const confirmDelete = () => {
+    if (deletingItemId !== null) {
+      removeItem(deletingItemId);
+      closeDeleteModal();
+    }
   };
-
-  const closeUpdateModal = () => {
-    setSelectedItemForEdit(null);
-  };
-
 
   return (
     <div>
-        <div>
-            <ListButton>All</ListButton>
-            <ListButton>Completed</ListButton>
-            <ListButton>Incompleted</ListButton>
-        </div>
-        <div>
-        {store.items.map((item) => (
-        <Task key={item.id}>
-          <TaskDesc><AiOutlineCheckCircle size={18}/>
-            &nbsp;{item.text}
-          </TaskDesc>
-          <TaskEdit onClick={() => openUpdateModal(item)}>Edit</TaskEdit>
-          <TaskDel onClick={() => openDeleteModal(item.id)}><RiDeleteBinLine size={18}/></TaskDel>
-          {selectedItemId !== null && (
-          <DeleteModal
-            onClose={closeDeleteModal}
-            onDelete={() => {
-              removeItem(selectedItemId);
-              closeDeleteModal();
-            }}
-          />
-          )}
-          {selectedItemForEdit !== null && (
-            <UpdateModal
-              item={selectedItemForEdit}
-              onClose={closeUpdateModal}
-              onUpdate={(updatedText) => {
-                updateItem(selectedItemForEdit.id, updatedText);
-                closeUpdateModal();
-              }}
-              />
+      <div>
+        <ListButton>All</ListButton>
+        <ListButton>Completed</ListButton>
+        <ListButton>Incompleted</ListButton>
+      </div>
+      <div>
+        {items.map((item) => (
+          <Task key={item.id}>
+            {editingItemId === item.id ? (
+              <>
+                <TaskDesc>
+                  <AiOutlineCheckCircle size={18} />
+                  <EditingInput
+                    type="text"
+                    value={editedText}
+                    onChange={(e) => setEditedText(e.target.value)}
+                  />
+                </TaskDesc>
+                <DoneInputBox>
+                  <p>Done</p>
+                  <input
+                    type="checkbox"
+                    checked={item.done}
+                    onChange={() => toggleItem(item.id)}
+                  />
+                </DoneInputBox>
+                <TaskEdit onClick={() => saveEditedItem(item.id)}>
+                  Edit
+                </TaskEdit>
+                <TaskDel onClick={cancelEditing}>Cancel</TaskDel>
+              </>
+            ) : (
+              <>
+                <TaskDesc>
+                  <AiOutlineCheckCircle size={18} />
+                  &nbsp;{item.text}
+                </TaskDesc>
+                <TaskEdit onClick={() => startEditing(item.id, item.text)}>
+                  Edit
+                </TaskEdit>
+                <TaskDel onClick={() => openDeleteModal(item.id)}>
+                  <RiDeleteBinLine size={18} />
+                </TaskDel>
+                <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onDelete={confirmDelete}
+      />
+              </>
             )}
-        </Task>
+          </Task>
         ))}
-        </div>
+      </div>
     </div>
   );
 }
