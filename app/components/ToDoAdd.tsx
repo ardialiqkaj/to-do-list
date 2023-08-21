@@ -1,5 +1,5 @@
 import * as React from "react";
-import styled from 'styled-components';
+import styled from "styled-components";
 import useStore from "../store";
 
 const FirstColumn = styled.div`
@@ -36,18 +36,20 @@ function TodoAdd() {
 
   return (
     <FirstColumn>
-    <Input
+      <Input
         type="text"
         value={store.newItem}
         onChange={(evt) => store.setNewItem(evt.target.value)}
-        placeholder="New item"></Input>
-    <CreateButton
-      onClick={() => {
-      store.addItem();
-    }}>
-      Create
-    </CreateButton>
-  </FirstColumn>
+        placeholder="Write your task here..."
+      ></Input>
+      <CreateButton
+        onClick={() => {
+          store.addItem();
+        }}
+      >
+        Create
+      </CreateButton>
+    </FirstColumn>
   );
 }
 

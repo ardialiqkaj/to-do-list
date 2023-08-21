@@ -1,14 +1,14 @@
 import * as React from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { AiOutlineCheckCircle } from "react-icons/ai";
 import { RiDeleteBinLine } from "react-icons/ri";
-import useStore from "../store";
+import useStore, { Item } from "../store";
 import DeleteModal from "./DeleteModal";
 import { useState } from "react";
 
 const ListButton = styled.button`
   color: #424242;
-  background-color: white;
+  background-color: ${(props) => (props.active ? "#ededed" : "white")};
   text-align: center;
   border: 2px solid #b4b4b4;
   height: 50px;
@@ -30,6 +30,7 @@ const TaskDesc = styled.p`
   flex: 10;
   margin: 8px;
   border: 2px solid #b4b4b4;
+  background-color: ${(props) => (props.done ? "#e3faf0" : "white")};
   height: 50px;
   border-radius: 5px;
   font-size: 16px;
@@ -102,8 +103,27 @@ function ItemAdd() {
     setEditedText("");
   };
 
+  // State for managing the modal
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
+
+  // State for filtering
+  const [filter, setFilter] = useState<"All" | "Completed" | "Not Completed">(
+    "All"
+  );
+  const [activeFilter, setActiveFilter] = useState<
+    "All" | "Completed" | "Not Completed"
+  >("All");
+
+  const filteredItems = items.filter((item) => {
+    if (filter === "All") {
+      return true;
+    } else if (filter === "Completed") {
+      return item.done;
+    } else {
+      return !item.done;
+    }
+  });
 
   const openDeleteModal = (id: number) => {
     setDeletingItemId(id);
@@ -125,16 +145,40 @@ function ItemAdd() {
   return (
     <div>
       <div>
-        <ListButton>All</ListButton>
-        <ListButton>Completed</ListButton>
-        <ListButton>Incompleted</ListButton>
+        <ListButton
+          active={activeFilter === "All"}
+          onClick={() => {
+            setFilter("All");
+            setActiveFilter("All");
+          }}
+        >
+          All
+        </ListButton>
+        <ListButton
+          active={activeFilter === "Completed"}
+          onClick={() => {
+            setFilter("Completed");
+            setActiveFilter("Completed");
+          }}
+        >
+          Completed
+        </ListButton>
+        <ListButton
+          active={activeFilter === "Not Completed"}
+          onClick={() => {
+            setFilter("Not Completed");
+            setActiveFilter("Not Completed");
+          }}
+        >
+          Incompleted
+        </ListButton>
       </div>
       <div>
-        {items.map((item) => (
+        {filteredItems.map((item) => (
           <Task key={item.id}>
             {editingItemId === item.id ? (
               <>
-                <TaskDesc>
+                <TaskDesc done={item.done}>
                   <AiOutlineCheckCircle size={18} />
                   <EditingInput
                     type="text"
@@ -157,7 +201,7 @@ function ItemAdd() {
               </>
             ) : (
               <>
-                <TaskDesc>
+                <TaskDesc done={item.done}>
                   <AiOutlineCheckCircle size={18} />
                   &nbsp;{item.text}
                 </TaskDesc>
@@ -168,10 +212,10 @@ function ItemAdd() {
                   <RiDeleteBinLine size={18} />
                 </TaskDel>
                 <DeleteModal
-        isOpen={isDeleteModalOpen}
-        onClose={closeDeleteModal}
-        onDelete={confirmDelete}
-      />
+                  isOpen={isDeleteModalOpen}
+                  onClose={closeDeleteModal}
+                  onDelete={confirmDelete}
+                />
               </>
             )}
           </Task>
