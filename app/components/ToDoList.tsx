@@ -2,6 +2,7 @@ import * as React from "react";
 import styled, { css } from "styled-components";
 import { AiOutlineCheckCircle } from "react-icons/ai";
 import { RiDeleteBinLine } from "react-icons/ri";
+import { BsPlusCircle } from "react-icons/bs";
 import useStore, { Item } from "../store";
 import DeleteModal from "./DeleteModal";
 import { useState } from "react";
@@ -74,6 +75,18 @@ const EditingInput = styled.input`
   display: flex;
   align-items: center;
   margin-left: 3px;
+`;
+
+const NoItemDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+`;
+
+const NoItemP = styled.p`
+  color: #8f8f8f;
 `;
 
 function ItemAdd() {
@@ -174,52 +187,60 @@ function ItemAdd() {
         </ListButton>
       </div>
       <div>
-        {filteredItems.map((item) => (
-          <Task key={item.id}>
-            {editingItemId === item.id ? (
-              <>
-                <TaskDesc done={item.done}>
-                  <AiOutlineCheckCircle size={18} />
-                  <EditingInput
-                    type="text"
-                    value={editedText}
-                    onChange={(e) => setEditedText(e.target.value)}
+        {filteredItems.length === 0 ? (
+          <NoItemDiv>
+            <p>You don't have any tasks</p>
+            <BsPlusCircle size={80} style={{ color: "#8f8f8f" }}/>
+            <NoItemP>Create Task</NoItemP>
+          </NoItemDiv>
+        ) : (
+          filteredItems.map((item) => (
+            <Task key={item.id}>
+              {editingItemId === item.id ? (
+                <>
+                  <TaskDesc done={item.done}>
+                    <AiOutlineCheckCircle size={18} style={{ color: item.done ? "green" : "black" }}/>
+                    <EditingInput
+                      type="text"
+                      value={editedText}
+                      onChange={(e) => setEditedText(e.target.value)}
+                    />
+                  </TaskDesc>
+                  <DoneInputBox>
+                    <p>Done</p>
+                    <input
+                      type="checkbox"
+                      checked={item.done}
+                      onChange={() => toggleItem(item.id)}
+                    />
+                  </DoneInputBox>
+                  <TaskEdit onClick={() => saveEditedItem(item.id)}>
+                    Edit
+                  </TaskEdit>
+                  <TaskDel onClick={cancelEditing}>Cancel</TaskDel>
+                </>
+              ) : (
+                <>
+                  <TaskDesc done={item.done}>
+                    <AiOutlineCheckCircle size={18} style={{ color: item.done ? "green" : "black" }}/>
+                    &nbsp;{item.text}
+                  </TaskDesc>
+                  <TaskEdit onClick={() => startEditing(item.id, item.text)}>
+                    Edit
+                  </TaskEdit>
+                  <TaskDel onClick={() => openDeleteModal(item.id)}>
+                    <RiDeleteBinLine size={18} />
+                  </TaskDel>
+                  <DeleteModal
+                    isOpen={isDeleteModalOpen}
+                    onClose={closeDeleteModal}
+                    onDelete={confirmDelete}
                   />
-                </TaskDesc>
-                <DoneInputBox>
-                  <p>Done</p>
-                  <input
-                    type="checkbox"
-                    checked={item.done}
-                    onChange={() => toggleItem(item.id)}
-                  />
-                </DoneInputBox>
-                <TaskEdit onClick={() => saveEditedItem(item.id)}>
-                  Edit
-                </TaskEdit>
-                <TaskDel onClick={cancelEditing}>Cancel</TaskDel>
-              </>
-            ) : (
-              <>
-                <TaskDesc done={item.done}>
-                  <AiOutlineCheckCircle size={18} />
-                  &nbsp;{item.text}
-                </TaskDesc>
-                <TaskEdit onClick={() => startEditing(item.id, item.text)}>
-                  Edit
-                </TaskEdit>
-                <TaskDel onClick={() => openDeleteModal(item.id)}>
-                  <RiDeleteBinLine size={18} />
-                </TaskDel>
-                <DeleteModal
-                  isOpen={isDeleteModalOpen}
-                  onClose={closeDeleteModal}
-                  onDelete={confirmDelete}
-                />
-              </>
-            )}
-          </Task>
-        ))}
+                </>
+              )}
+            </Task>
+          ))
+        )}
       </div>
     </div>
   );
